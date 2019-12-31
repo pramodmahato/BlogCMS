@@ -13,5 +13,5 @@ It has all the features like:
 9) Delete Post
 10) Delete Comment
 11) Featured Image
-12)Admin Dashboard
+12) Admin Dashboard
 13) Viewer Count for Each Post
