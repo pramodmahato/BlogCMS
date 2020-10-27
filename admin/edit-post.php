@@ -17,10 +17,9 @@ if(isset($_POST['publish']))
 	
 	if(!empty($title)&&!empty($desc)&&!empty($author))
 	{
-		
-		$sql = "update posts set title='$title',description='$desc',status='publish' where Post_ID=".$pid.";";
- 
- if(mysqli_query($db, $sql)){
+        $stmt = $db->prepare("update posts set title=?,description=?,status='publish' where Post_ID= ?");
+        $stmt->bind_param("sss", $title, $desc, $pid);
+        if ($stmt->execute()) {
  echo "Updated Succesfully!";
  header("Location: edit-post.php?pid=".$_POST['pid']);
  }
@@ -41,10 +40,10 @@ if(isset($_POST['draft']))
 	$author=$_SESSION['ID'];
 	if(!empty($title)&&!empty($desc)&&!empty($author))
 	{
-		
-		$sql = "update posts set title=$title,description=$desc,status='draft'where pid=".$_POST['pid'].";";
- 
- if(mysqli_query($db, $sql)){
+
+        $stmt = $db->prepare("update posts set title=?,description=?,status='draft' where pid= ?");
+        $stmt->bind_param("sss", $title, $desc, $pid);
+        if ($stmt->execute()) {
  echo "Saved As Draft!";
  }
  else{
@@ -66,14 +65,16 @@ else
 <?php
 if (isset($_GET['pid'])) {
 	$pid=$_GET['pid'];
-	
+
 }
 if (isset($_POST['pid'])) {
 	$pid=$_POST['pid'];
-	
+
 }
-if($result = mysqli_query($db,"select *from posts where Post_ID like '$pid';")
-)
+$stmt = $db->prepare("select *from posts where Post_ID like ?");
+$stmt->bind_param("s", $pid);
+$stmt->execute();
+if ($result = $stmt->get_result())
 	{$row = mysqli_fetch_assoc($result);
 	}
 	else

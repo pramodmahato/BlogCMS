@@ -12,19 +12,22 @@ include("config.php");
       $site= "<script type='text/javascript'>window.location='login.php'</script>";
         echo $site;
     }
- 
-$result = mysqli_query($db,"select *from users where email like '$email';"); 
+$stmt = $db->prepare("select *from users where email like ?");
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$result = $stmt->get_result();
 $row = mysqli_fetch_assoc($result);
 $originalpass=$row['Password'];
-                                   
+
 if(isset($_POST['submit']))
 {
   $old=md5($_POST['oldpass']);
   $new=md5($_POST['newpass']);
   if($old==$originalpass)
   {
-    $newsql="UPDATE users SET Password = '$new' WHERE email='$email'";
-    if(mysqli_query($db, $newsql)){
+      $stmt = $db->prepare("UPDATE users SET Password = ? WHERE email=?");
+      $stmt->bind_param("ss", $new, $email);
+      if ($stmt->execute()) {
       echo "Password Changed Successfully";
  header("Location:login.php");
  }else {

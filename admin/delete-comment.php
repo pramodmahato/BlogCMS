@@ -7,9 +7,9 @@ if ($db->connect_error) {
     die("Connection failed ");
 } 
 
-$sql = "DELETE FROM comments WHERE C_ID=".$_POST['cid'];
-
-if ($db->query($sql) === TRUE) {
+$stmt = $db->prepare("DELETE FROM comments WHERE C_ID= ?");
+$stmt->bind_param("s", $_POST['cid']);
+if ($stmt->execute()) {
     echo "Post deleted successfully";
     header("Location: all-comments.php");
 } else {

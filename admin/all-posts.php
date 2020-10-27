@@ -134,7 +134,7 @@ th, td {
 
 	
 <div class="artic" >
-		
+
 		<div class="individual">
 			<?php
 			include('config.php');
@@ -143,8 +143,10 @@ if (mysqli_connect_errno())
 {
 echo "Failed to connect to MySQL: " . mysqli_connect_error();
 }
-
-$result = mysqli_query($db,"SELECT * FROM posts where author='".$uid."' order by date desc;");
+        $stmt = $db->prepare("SELECT * FROM posts where author=? order by date desc");
+        $stmt->bind_param("s", $uid);
+        $stmt->execute();
+        $result = $stmt->get_result();
 echo "<h1 align='center'>All Posts</h1>";
 echo "<table style='overflow-x:auto;'>
 <tr>
@@ -157,10 +159,12 @@ echo "<table style='overflow-x:auto;'>
 </tr>";
 
 while($row = mysqli_fetch_array($result))
-{	
-	$query="SELECT * from comments where Post_ID=".$row['Post_ID'].";";
-	$res = mysqli_query($db,$query);
-	$rowcount=mysqli_num_rows($res);
+{
+    $stmt = $db->prepare("SELECT * from comments where Post_ID=? ");
+    $stmt->bind_param("s", $row['Post_ID']);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    $rowcount = mysqli_num_rows($res);
 
 echo "<tr>";
 echo "<td>" . $row['Post_ID'] . "</td>";

@@ -6,9 +6,10 @@ if(isset($_POST['submit']))
 	$pass=md5($_POST['pass']);
 	include('config.php');
 
-	$sql = "SELECT * from users WHERE Email='$email'" ;
-
-  $queryResult = $db->query($sql);
+    $stmt=$db->prepare("SELECT * from users WHERE Email=?;");
+    $stmt->bind_param("s",$email);
+    $stmt->execute();
+    $queryResult =$stmt->get_result();
 $foundRows = $queryResult->num_rows;
 echo $foundRows;
 
@@ -17,9 +18,9 @@ echo $foundRows;
    }
    else
    {
-   	$sql = "insert into users (Name,Email,Password,Created) values ('$name','$email','$pass',CURDATE())";
- 
- if(mysqli_query($db, $sql)){
+       $stmt = $db->prepare("insert into users (Name,Email,Password,Created) values (?,?,?,CURDATE())");
+       $stmt->bind_param("sss", $name, $email, $pass);
+       if ($stmt->execute()) {
  header("Location: admin/login.php");
  }
    }
