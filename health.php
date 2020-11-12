@@ -57,10 +57,10 @@ $sql = "SELECT Post_ID,title,description,author,featured from posts where status
 $result = $db->query($sql);
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
-    	
-    	$sql2 = "SELECT Name from users where email='".$row['author']."';";
-    	
-$result2 = $db->query($sql2);
+        $stmt=$db->prepare("SELECT Name from users where email=?;");
+        $stmt->bind_param("s",$row['author']);
+        $stmt->execute();
+        $result2 =$stmt->get_result();
 $row2 = $result2->fetch_assoc();
         echo "<div class='articlelink'>
                <img src='admin/uploads/".$row['featured']."' width='100%' height='70%' class='articimage'><br>

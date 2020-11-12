@@ -5,11 +5,11 @@ if(isset($_SESSION['ID']))
 {
 	if ($db->connect_error) {
     die("Connection failed");
-} 
+}
 
-$sql = "DELETE FROM posts WHERE Post_ID=".$_POST['pid'];
-
-if ($db->query($sql) === TRUE) {
+    $stmt = $db->prepare("DELETE FROM posts WHERE Post_ID= ?");
+    $stmt->bind_param("s", $_POST['pid']);
+    if ($stmt->execute()) {
     echo "Post deleted successfully";
     header("Location: all-posts.php");
 } else {

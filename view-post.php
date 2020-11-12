@@ -18,11 +18,9 @@ if(isset($_POST['comment']))
 		$com= $_POST['com'];
 		$mail= $_POST['email'];
 		$p=$_POST['pid'];
-
-
-					$sql = "insert into comments (content,author,date,Post_ID) values ('$com','$mail',now(),'$p')";
- 
- if(mysqli_query($db, $sql)){
+        $stmt = $db->prepare("insert into comments (content,author,date,Post_ID) values (?,?,now(),?)");
+        $stmt->bind_param("sss", $com, $mail, $p);
+        if ($stmt->execute()){
  echo "Comment Added!";
  }
  else{
@@ -38,9 +36,9 @@ else
 }
 if(isset($_POST['deletekar']))
 {
-	$sql = "DELETE FROM comments WHERE C_ID=".$_POST['cid'];
-
-if ($db->query($sql) === TRUE) {
+    $stmt=$db->prepare("DELETE FROM comments WHERE C_ID=?");
+    $stmt->bind_param("s",$_POST['cid']);
+if ($stmt->execute() === TRUE) {
     echo "Comment deleted successfully";
     header("Location: view-post.php?pid=".$_POST['pid']);
 } else {
@@ -48,17 +46,19 @@ if ($db->query($sql) === TRUE) {
     header("Location: view-post.php?pid=".$_POST['pid']);
 }
 
-$conn->close();	
+$conn->close();
 }
 
 
-$sql = "SELECT title,description,author,date,featured,visitors from posts where Post_ID=".$p.";";
-if($result = $db->query($sql))
-{
+$stmt = $db->prepare("SELECT title,description,author,date,featured,visitors from posts where Post_ID=?");
+$stmt->bind_param("s", $p);
+$stmt->execute();
+if ($result = $stmt->get_result()) {
 $row = $result->fetch_assoc();
 session_start();
-$sql2="UPDATE posts SET visitors=visitors+1 WHERE Post_ID=".$p.";";
-					mysqli_query($db, $sql2);	
+    $stmt = $db->prepare("UPDATE posts SET visitors=visitors+1 WHERE Post_ID=?");
+    $stmt->bind_param("s", $p);
+    $stmt->execute();
 }
 else
 {
@@ -274,10 +274,10 @@ else
 {
 	echo "<a href='admin/login.php'>Log In</a> to Post Comment";
 }
-
-
-		$sql3 = "SELECT content,author,date,C_ID from comments where Post_ID=".$p.";";
-$result3 = $db->query($sql3);
+            $stmt = $db->prepare("SELECT content,author,date,C_ID from comments where Post_ID=?");
+            $stmt->bind_param("s", $p);
+            $stmt->execute();
+            $result3 = $stmt->get_result();
 while($row3 = $result3->fetch_assoc())
 {
 

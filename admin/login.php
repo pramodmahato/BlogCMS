@@ -6,15 +6,17 @@ if(isset($_POST['submit']))
    $myusername =$_POST['email'];
    $mypassword = md5($_POST['pass']);
    session_start();
-   session_destroy(); 
-
-$result = mysqli_query($db,"select *from users where email='$myusername' and password='$mypassword';"); 
+   session_destroy();
+    $stmt = $db->prepare("select *from users where email=? and password=?");
+    $stmt->bind_param("ss", $myusername, $mypassword);
+    $stmt->execute();
+    $result = $stmt->get_result();
 $row = mysqli_fetch_assoc($result);
-   
-  
+
+
       $rowcount=mysqli_num_rows($result);
-      
-      
+
+
       if((int)$rowcount>0)
       {
           session_start();

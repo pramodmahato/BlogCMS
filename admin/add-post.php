@@ -27,11 +27,10 @@ if(isset($_POST['publish']))
 	if(!empty($title)&&!empty($desc)&&!empty($author)&&!empty($category)&&!empty($filename))
 	{
 
-		include('config.php');
-		$sql = "insert into posts (title,description,date,author,status,featured,category) values ('$title','$desc',now(),'$author','publish','$filename','$category')";
-
- 
- if(mysqli_query($db, $sql)){
+        include('config.php');
+        $stmt = $db->prepare("insert into posts (title,description,date,author,status,featured,category) values(?,?,now(),?,'publish',?,?)");
+        $stmt->bind_param("sssss", $title, $desc, $author, $filename, $category);
+        if ($stmt->execute()) {
  echo "Posted Succesfully!";
  }
  else{
@@ -67,10 +66,10 @@ if(isset($_POST['draft']))
 }
 	if(!empty($title)&&!empty($desc)&&!empty($author))
 	{
-		include('config.php');
-		$sql = "insert into posts (title,description,date,author,status,featured,category) values ('$title','$desc',CURDATE(),'$author','draft','$filename','$category')";
- 
- if(mysqli_query($db, $sql)){
+        include('config.php');
+        $stmt = $db->prepare("insert into posts (title,description,date,author,status,featured,category) values(?,?,CURDATE(),?,'draft',?,?)");
+        $stmt->bind_param("sssss", $title, $desc, $author, $filename, $category);
+        if ($stmt->execute()) {
  echo "Saved As Draft!";
  }
  else{
